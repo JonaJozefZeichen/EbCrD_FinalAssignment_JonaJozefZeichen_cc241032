@@ -8,30 +8,28 @@ public class PlanetGravitySource : MonoBehaviour
 
     public void Attract(Rigidbody body)
     {
-        // Skip processing if reference is missing to avoid crashes
         if (body == null) return;
 
-        // Calculate unit normal vector pointing straight outward from planet core
+        // "Down" is whatever direction points away from the core, not a fixed world axis
         Vector3 surfaceNormal = (body.position - transform.position).normalized;
         Vector3 gravityDirection = -surfaceNormal;
 
-        // Apply constant inward acceleration pulling player toward planet core
+        // ForceMode.Acceleration ignores mass, so everything falls at the same rate regardless of Rigidbody.mass
         body.AddForce(gravityDirection * gravity, ForceMode.Acceleration);
 
-        // Calculate target forward vector perpendicular to surface normal to preserve yaw orientation
+        // Keep the body's current facing but flatten it onto the new tangent plane, otherwise yaw resets every frame
         Vector3 currentForward = body.transform.forward;
         Vector3 alignedForward = Vector3.ProjectOnPlane(currentForward, surfaceNormal).normalized;
 
-        // Fall back to current forward if vector drops to zero to prevent invalid rotation
+        // Forward and the surface normal can end up parallel (e.g. looking straight up), which zeroes the projection above
         if (alignedForward.sqrMagnitude < 0.001f)
         {
             alignedForward = Vector3.ProjectOnPlane(body.transform.up, surfaceNormal).normalized;
         }
 
-        // Create target rotation where local Up matches surface normal and local Forward matches surface tangent
         Quaternion targetRotation = Quaternion.LookRotation(alignedForward, surfaceNormal);
 
-        // Smoothly rotate rigidbody through physics engine
+        // Slerp rather than snap, otherwise crossing terrain seams causes visible rotation pops
         body.MoveRotation(Quaternion.Slerp(body.rotation, targetRotation, alignmentSpeed * Time.fixedDeltaTime));
     }
 }

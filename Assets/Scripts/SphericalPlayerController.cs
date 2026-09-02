@@ -23,72 +23,61 @@ public class SphericalPlayerController : MonoBehaviour
 
     private void Awake()
     {
-        // Cache required rigidbody component
         rb = GetComponent<Rigidbody>();
 
-        // Ensure gravity is disabled on rigidbody to prevent conflict with planet attractor
+        // Built-in gravity would fight PlanetGravitySource's own pull direction
         rb.useGravity = false;
 
-        // Instantiate input asset wrapper instance
         inputActions = new InputSystem_Actions();
     }
 
     private void OnEnable()
     {
-        // Enable player action map to process input events
         inputActions.Player.Enable();
 
-        // Lock cursor to center of game window so mouse does not drift off screen
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
     private void OnDisable()
     {
-        // Disable player action map to stop processing inputs while inactive
         inputActions.Player.Disable();
 
-        // Release cursor lock so user can interact with editor
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
     }
 
     private void Update()
     {
-        // Read mouse and WASD input directly each frame for responsive controls
+        // Polled here instead of via callback so held keys don't drop a frame between input events
         moveInput = inputActions.Player.Move.ReadValue<Vector2>();
         lookInput = inputActions.Player.Look.ReadValue<Vector2>();
 
-        // Process vertical camera pitch and horizontal turning
         HandleLook();
     }
 
     private void FixedUpdate()
     {
-        // Attract and align body to planet surface normal inside physics loop
         if (planetGravity != null)
         {
             planetGravity.Attract(rb);
         }
 
-        // Apply tangential movement displacement along spherical surface
         HandleMovement();
     }
 
     private void HandleLook()
     {
-        // Calculate horizontal yaw and vertical pitch deltas
         float mouseX = lookInput.x * mouseSensitivity;
         float mouseY = lookInput.y * mouseSensitivity;
 
-        // Apply horizontal yaw by rotating body around its current local Up axis
+        // Yaw turns the whole body around its own local up, whatever that currently is on the sphere
         transform.Rotate(0f, mouseX, 0f, Space.Self);
 
-        // Clamp camera vertical pitch to prevent flipping
+        // Pitch only ever touches the camera, not the body, so looking up/down can't tilt the walk direction
         cameraPitch -= mouseY;
         cameraPitch = Mathf.Clamp(cameraPitch, -verticalLookLimit, verticalLookLimit);
 
-        // Apply clamped pitch strictly to camera transform
         if (cameraTransform != null)
         {
             cameraTransform.localRotation = Quaternion.Euler(cameraPitch, 0f, 0f);
@@ -97,13 +86,12 @@ public class SphericalPlayerController : MonoBehaviour
 
     private void HandleMovement()
     {
-        // Clamp diagonal input magnitude to 1 so moving diagonally doesn't make the player run faster
+        // W+D unclamped would add up to sqrt(2) speed, clamp to 1 so diagonals aren't faster
         Vector2 clampedInput = Vector2.ClampMagnitude(moveInput, 1.0f);
 
-        // Calculate direction along player local surface tangents
         Vector3 moveDirection = (transform.forward * clampedInput.y + transform.right * clampedInput.x);
 
-        // Displace position smoothly without overriding gravity fall velocity
+        // MovePosition instead of adding velocity, so this can't stack with the gravity force each frame
         Vector3 displacement = moveDirection * walkSpeed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + displacement);
     }

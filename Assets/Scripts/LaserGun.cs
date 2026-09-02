@@ -18,7 +18,6 @@ public class LaserGun : MonoBehaviour
 
     private void OnEnable()
     {
-        // Bind input action callback to shoot trigger
         if (shootAction != null)
         {
             shootAction.action.performed += OnShootInput;
@@ -28,7 +27,7 @@ public class LaserGun : MonoBehaviour
 
     private void OnDisable()
     {
-        // Unbind input action callback to prevent memory leaks
+        // Unsubscribe or the delegate keeps a reference and leaks the gun
         if (shootAction != null)
         {
             shootAction.action.performed -= OnShootInput;
@@ -38,41 +37,35 @@ public class LaserGun : MonoBehaviour
 
     private void OnShootInput(InputAction.CallbackContext context)
     {
-        // Block shot attempt if weapon is still cooling down
         if (Time.time < nextFireTime) return;
 
-        // Update cooldown timer before executing shot logic
         nextFireTime = Time.time + fireRate;
-
-        // Spawn and orient laser bullet
         Shoot();
     }
 
     private void Shoot()
     {
-        // Abort if bullet prefab or spawn point is unassigned to prevent null reference crashes
         if (bulletPrefab == null || firePoint == null) return;
 
-        // Fall back to current transform if aim camera is unassigned
+        // Fall back to own transform if no aim camera was assigned in the inspector
         Transform cameraSource = aimCamera != null ? aimCamera : transform;
         Vector3 targetPoint;
 
-        // Raycast forward from camera center to find what the player is aiming at
+        // Raycast from the camera, not the muzzle, so aim always matches what's on screen
         if (Physics.Raycast(cameraSource.position, cameraSource.forward, out RaycastHit hitInfo, 200f))
         {
             targetPoint = hitInfo.point;
         }
         else
         {
-            // Project point into far distance so bullets still travel forward when aiming into empty space
+            // Nothing hit within range, aim far out so the bullet still flies straight
             targetPoint = cameraSource.position + (cameraSource.forward * 200f);
         }
 
-        // Calculate direction vector from muzzle to target point so bullet converges on crosshair
+        // Aim from the muzzle toward that point, not straight ahead, so the bullet converges on the crosshair instead of drifting with the muzzle offset
         Vector3 aimDirection = (targetPoint - firePoint.position).normalized;
         Quaternion bulletRotation = Quaternion.LookRotation(aimDirection);
 
-        // Instantiate bullet prefab at muzzle with aligned trajectory
         Instantiate(bulletPrefab, firePoint.position, bulletRotation);
     }
 }
