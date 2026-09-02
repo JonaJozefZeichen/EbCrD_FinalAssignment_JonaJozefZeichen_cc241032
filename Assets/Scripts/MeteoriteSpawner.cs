@@ -4,6 +4,7 @@ public class MeteoriteSpawner : MonoBehaviour
 {
     [Header("Spawn Transforms")]
     [SerializeField] private Transform planetCenter; // Serves as the origin anchor and gravitational target for spawned objects
+    [SerializeField] private SphereCollider planetCollider; // Identifies planet impacts for spawned meteorites - lives on "Planet", a different GameObject than this spawner's "PlanetCore"
     [SerializeField] private GameObject meteoritePrefab; // References meteorite prefab to instantiate into orbit
 
     [Header("Spherical Spawn Settings")]
@@ -60,6 +61,11 @@ public class MeteoriteSpawner : MonoBehaviour
         if (spawnedObject.TryGetComponent(out MeteoriteMovement movementComponent))
         {
             movementComponent.SetGravityTarget(planetCenter);
+        }
+
+        if (spawnedObject.TryGetComponent(out DestructibleObject destructibleComponent))
+        {
+            destructibleComponent.SetPlanetCollider(planetCollider);
         }
     }
 
