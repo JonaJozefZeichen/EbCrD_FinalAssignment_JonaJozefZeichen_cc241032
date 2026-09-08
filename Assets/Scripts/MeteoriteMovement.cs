@@ -5,18 +5,16 @@ using UnityEngine;
 public class MeteoriteMovement : MonoBehaviour
 {
     [Header("Flight & Attraction")]
-    [SerializeField] private float fallSpeed = 6.0f; // Sets baseline inward travel velocity toward planet center
-    [SerializeField] private float rotationSpeed = 30.0f; // Adds tumbling rotation so meteorites feel organic during flight
+    [SerializeField] private float fallSpeed = 6.0f;
+    [SerializeField] private float rotationSpeed = 30.0f;
 
-    private Rigidbody rb; // Kinematic, moving a collider with no Rigidbody every frame is expensive in PhysX
+    private Rigidbody rb;
     private Transform gravityTarget;
     private Vector3 tumbleAxis;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody>();
-
-        // Everything here is driven by hand through MovePosition, physics forces would fight it
         rb.isKinematic = true;
         rb.useGravity = false;
     }

@@ -3,20 +3,20 @@ using UnityEngine;
 public class MeteoriteSpawner : MonoBehaviour
 {
     [Header("Spawn Transforms")]
-    [SerializeField] private Transform planetCenter; // Serves as the origin anchor and gravitational target for spawned objects
-    [SerializeField] private SphereCollider planetCollider; // Identifies planet impacts for spawned meteorites - lives on "Planet", a different GameObject than this spawner's "PlanetCore"
-    [SerializeField] private GameObject meteoritePrefab; // References meteorite prefab to instantiate into orbit
+    [SerializeField] private Transform planetCenter;
+    [SerializeField] private SphereCollider planetCollider;
+    [SerializeField] private GameObject meteoritePrefab;
 
     [Header("Spherical Spawn Settings")]
-    [SerializeField] private float spawnRadius = 35.0f; // Sets spherical distance from planet center where meteorites appear
-    [SerializeField] private float minSpawnInterval = 1.5f; // Sets shortest possible delay between spawns
-    [SerializeField] private float maxSpawnInterval = 4.0f; // Sets longest possible delay between spawns
+    [SerializeField] private float spawnRadius = 35.0f;
+    [SerializeField] private float minSpawnInterval = 1.5f;
+    [SerializeField] private float maxSpawnInterval = 4.0f;
 
     [Header("Gizmo Visualizer")]
-    [SerializeField] private bool showGizmos = true; // Toggles editor wireframe sphere for visual debugging
-    [SerializeField] private Color gizmoColor = new Color(1f, 0.5f, 0f, 0.3f); // Defines editor display color for spawn boundary
+    [SerializeField] private bool showGizmos = true;
+    [SerializeField] private Color gizmoColor = new Color(1f, 0.5f, 0f, 0.3f);
 
-    private float nextSpawnTime = 0f; // Tracks timestamp when next meteorite should instantiate
+    private float nextSpawnTime = 0f;
 
     private void Start()
     {
@@ -39,7 +39,6 @@ public class MeteoriteSpawner : MonoBehaviour
 
     private void ScheduleNextSpawn()
     {
-        // Randomized so spawns don't fall into an obvious, learnable rhythm
         float randomDelay = Random.Range(minSpawnInterval, maxSpawnInterval);
         nextSpawnTime = Time.time + randomDelay;
     }
@@ -48,11 +47,9 @@ public class MeteoriteSpawner : MonoBehaviour
     {
         if (meteoritePrefab == null) return;
 
-        // Random.onUnitSphere already gives a uniform direction, just scale it out to the shell radius
         Vector3 randomDirection = Random.onUnitSphere;
         Vector3 spawnPosition = planetCenter.position + (randomDirection * spawnRadius);
 
-        // Face inward on spawn so it doesn't visibly snap-rotate on the first movement tick
         Vector3 inwardDirection = (planetCenter.position - spawnPosition).normalized;
         Quaternion spawnRotation = Quaternion.LookRotation(inwardDirection);
 

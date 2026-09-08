@@ -1,0 +1,21 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../UIElementsSchema/UIElements.xsd" editor-extension-mode="False">
+    <ui:VisualElement name="hud-root" picking-mode="Ignore" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; display: none;">
+        <ui:VisualElement name="crosshair-root" picking-mode="Ignore" style="flex-grow: 1; align-items: center; justify-content: center;">
+            <ui:VisualElement name="crosshair-dot" picking-mode="Ignore" style="width: 6px; height: 6px; border-radius: 3px; background-color: rgba(255, 255, 255, 0.9); border-width: 1px; border-color: rgba(0, 0, 0, 0.6);" />
+        </ui:VisualElement>
+        <ui:Label name="meteorite-counter" text="Destroyed: 0" picking-mode="Ignore" style="position: absolute; top: 16px; left: 16px; font-size: 20px; color: rgb(255, 255, 255); -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.8);" />
+        <ui:Label name="planet-health" text="Planet HP: 100/100" picking-mode="Ignore" style="position: absolute; top: 16px; right: 16px; font-size: 20px; color: rgb(255, 255, 255); -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.8);" />
+    </ui:VisualElement>
+
+    <ui:VisualElement name="start-screen" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; display: flex;">
+        <ui:Label text="Planetary Defense" style="font-size: 48px; color: rgb(255, 255, 255); -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.8); margin-bottom: 12px;" />
+        <ui:Label text="Defend the planet from incoming meteorites" style="font-size: 20px; color: rgb(220, 220, 220); margin-bottom: 32px;" />
+        <ui:Button name="start-button" text="Start" style="font-size: 24px; padding-left: 24px; padding-right: 24px; padding-top: 8px; padding-bottom: 8px;" />
+    </ui:VisualElement>
+
+    <ui:VisualElement name="end-screen" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0, 0, 0, 0.75); align-items: center; justify-content: center; display: none;">
+        <ui:Label text="Planet Destroyed" style="font-size: 48px; color: rgb(255, 80, 80); -unity-text-outline-width: 1px; -unity-text-outline-color: rgba(0, 0, 0, 0.8); margin-bottom: 12px;" />
+        <ui:Label name="final-score-label" text="Meteorites Destroyed: 0" style="font-size: 22px; color: rgb(255, 255, 255); margin-bottom: 32px;" />
+        <ui:Button name="restart-button" text="Restart" style="font-size: 24px; padding-left: 24px; padding-right: 24px; padding-top: 8px; padding-bottom: 8px;" />
+    </ui:VisualElement>
+</ui:UXML>
